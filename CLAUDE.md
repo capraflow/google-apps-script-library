@@ -17,8 +17,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Authenticate**: `pnpm run login` - Login to Google Apps Script via clasp
 
 ### Distribution Build Commands
-- **Generate JSDoc Types**: TBD - Creates single `.js` file with JSDoc `@typedef` comments (Method 1)
-- **Build NPM Types Package**: TBD - Generates `.d.ts` files for NPM distribution (Method 2)
+- **Generate JSDoc Types**: `pnpm run build:jsdoc` - Creates single `.js` file with JSDoc `@typedef` comments (Method 1)
+- **Build NPM Types Package**: `pnpm run build:types` - Generates `.d.ts` files for NPM distribution (Method 2)
+- **Build All Distribution Formats**: `pnpm run build:all` - Generates both JSDoc and TypeScript declaration files
 - **Build NPM Bundle Package**: TBD - Creates self-contained NPM package with code + types (Method 3)
 - **Package for NPM**: TBD - Prepares package.json and files for NPM publishing
 
@@ -83,8 +84,8 @@ The project supports multiple distribution formats:
 - **`app/` directory**: Contains the actual GAS code that gets deployed
 - **`dist/` directory**: Generated TypeScript declaration files (`.d.ts`) for type checking
 - **Distribution outputs**:
-  - `dist/jsdoc/` - JSDoc commented files for Method 1 (GAS IDE)
-  - `dist/types/` - Declaration files for Method 2 (NPM types package)
+  - `dist/types-jsdoc/` - JSDoc commented files for Method 1 (GAS IDE)
+  - `dist/types/` - Declaration files for Method 2 (NPM types package)  
   - `dist/bundle/` - Complete package for Method 3 (NPM bundle)
 
 ### Usage Examples

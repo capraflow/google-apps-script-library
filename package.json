@@ -1,9 +1,13 @@
 {
   "name": "uhr-cloud-script",
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "audit": "biome ci",
     "build": "tsc",
+    "build:jsdoc": "node scripts/build-jsdoc.js",
+    "build:types": "node scripts/build-types.js",
+    "build:all": "pnpm run build:jsdoc && pnpm run build:types",
     "check": "biome check --write",
     "clean": "rm -rf node_modules",
     "push": "clasp push",
@@ -14,6 +18,7 @@
     "@biomejs/biome": "^2",
     "@google/clasp": "3.0.6-alpha",
     "@types/google-apps-script": "^2",
+    "ts-morph": "^27",
     "typescript": "^5"
   }
 }
