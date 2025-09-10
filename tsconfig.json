@@ -1,0 +1,20 @@
+{
+  "include": ["app/**/*"],
+  "compilerOptions": {
+    "target": "esnext", // Set the JavaScript language version for emitted JavaScript and include compatible library declarations.
+    "allowJs": true, // Tells TypeScript to read JS files, as normally they are ignored as source files.
+    "checkJs": true, // Enable error reporting in .js files.
+    "noImplicitAny": true, // Raise error on expressions and declarations with an implied 'any' type.
+    "noImplicitReturns": false, // Report error when not all code paths in function return a value.
+    "noImplicitThis": true, // Raise error on 'this' expressions with an implied 'any' type.
+    "strictBindCallApply": true, // Check that the arguments for bind, call, and apply methods match the original function.
+    "strictFunctionTypes": true, // Ensure function parameters are checked more thoroughly.
+    "strictNullChecks": true, // Ensure null and undefined are only assignable to themselves and any.
+    "strictPropertyInitialization": true, // Ensure non-undefined class properties are initialized in the constructor.
+    "declaration": true, // Generate d.ts files.
+    "emitDeclarationOnly": true, // Compiler run should only output d.ts files.
+    "outDir": "dist", // Types should go into this directory. Removing this would place the .d.ts files next to the .js files.
+    "declarationMap": true, // Go to js file when using IDE functions like "Go to Definition" in VSCode.
+    "skipLibCheck": true // Skip type checking of all declaration files (*.d.ts).
+  }
+}

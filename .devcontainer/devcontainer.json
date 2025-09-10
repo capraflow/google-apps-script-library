@@ -1,0 +1,31 @@
+// https://aka.ms/devcontainer.json
+{
+  "name": "Dev Container",
+  // Image to use for dev container (https://containers.dev/guide/dockerfile)
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  // Features to add to the dev container (https://containers.dev/features)
+  "features": {
+    "ghcr.io/devcontainers/features/node": {
+      "installPnpm": true
+    },
+    "ghcr.io/devcontainers/features/python": {},
+    "ghcr.io/devcontainers-extra/features/poetry": {},
+    "ghcr.io/devcontainers/features/github-cli": {}
+  },
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": ".devcontainer/install-packages.sh",
+  // Configure tool-specific properties.
+  "customizations": {
+    "vscode": {
+      // Add the IDs of extensions to install here. Extensions will be installed in the container.
+      "extensions": [
+        "amodio.toggle-excluded-files",
+        "Anthropic.claude-code",
+        "bierner.markdown-mermaid",
+        "biomejs.biome",
+        "logerfo.open-all-files",
+        "mhutchie.git-graph"
+      ]
+    }
+  }
+}
