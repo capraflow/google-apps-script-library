@@ -19,9 +19,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Distribution Build Commands
 - **Generate JSDoc Types**: `pnpm run build:jsdoc` - Creates single `.js` file with JSDoc `@typedef` comments (Method 1)
 - **Build NPM Types Package**: `pnpm run build:types` - Generates `.d.ts` files for NPM distribution (Method 2)
-- **Build All Distribution Formats**: `pnpm run build:all` - Generates both JSDoc and TypeScript declaration files
-- **Build NPM Bundle Package**: TBD - Creates self-contained NPM package with code + types (Method 3)
-- **Package for NPM**: TBD - Prepares package.json and files for NPM publishing
+- **Build JavaScript for GAS**: `pnpm run build:gas` - Converts TypeScript to JavaScript for Google Apps Script deployment
+- **Build NPM Bundle Package**: `pnpm run build:npm` - Creates self-contained NPM package with TypeScript code + types (Method 3)
+- **Build All Distribution Formats**: `pnpm run build:all` - Generates all distribution formats (JSDoc, Types, GAS, NPM)
 
 ## Project Architecture
 
@@ -85,8 +85,9 @@ The project supports multiple distribution formats:
 - **`dist/` directory**: Generated TypeScript declaration files (`.d.ts`) for type checking
 - **Distribution outputs**:
   - `dist/types-jsdoc/` - JSDoc commented files for Method 1 (GAS IDE)
-  - `dist/types/` - Declaration files for Method 2 (NPM types package)  
-  - `dist/bundle/` - Complete package for Method 3 (NPM bundle)
+  - `dist/types/` - Declaration files for Method 2 (NPM types package)
+  - `dist/gas/` - JavaScript files for Google Apps Script deployment
+  - `dist/npm/` - Complete NPM package for Method 3 (bundling)
 
 ### Usage Examples
 
@@ -118,9 +119,28 @@ const headers: HttpHeaders = MyUtilityLibrary.createHeaders();
 npm install @your-org/gas-utils
 ```
 ```typescript
-// Import and bundle directly into your project
-import { createHeaders } from '@your-org/gas-utils';
-const headers = createHeaders(); // No library linking needed
+// Import specific functions
+import { toDate, isDate } from '@your-org/gas-utils';
+
+function myGASFunction() {
+  const date = toDate('2023-01-01');
+  if (isDate(date)) {
+    console.log(date.toISOString());
+  }
+}
+```
+
+Or import everything:
+```typescript
+// Import all utilities
+import * as Utils from '@your-org/gas-utils';
+
+function myGASFunction() {
+  const date = Utils.toDate('2023-01-01');
+  if (Utils.isDate(date)) {
+    console.log(date.toISOString());
+  }
+}
 ```
 
 This library provides utility functions for common Google Apps Script development tasks including HTTP operations, MIME type handling, and runtime type validation.
