@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { mkdir, writeFile, readdir } from 'node:fs/promises'
-import { join, basename, extname } from 'node:path'
+import { mkdir, writeFile } from 'node:fs/promises'
+import { basename, join } from 'node:path'
 import { Project } from 'ts-morph'
 
 async function buildGAS() {
@@ -18,7 +18,7 @@ async function buildGAS() {
   for (const sourceFile of sourceFiles) {
     const fileName = basename(sourceFile.getFilePath(), '.ts')
     const jsContent = convertTSToJS(sourceFile)
-    
+
     await writeFile(join(outputDir, `${fileName}.js`), jsContent)
   }
 
@@ -28,7 +28,7 @@ async function buildGAS() {
     const appScriptFile = appScriptProject.addSourceFileAtPath('./app/appsscript.json')
     const content = appScriptFile.getFullText()
     await writeFile(join(outputDir, 'appsscript.json'), content)
-  } catch (error) {
+  } catch (_error) {
     // appsscript.json doesn't exist, skip
   }
 
@@ -37,7 +37,7 @@ async function buildGAS() {
 
 function convertTSToJS(sourceFile) {
   const lines = []
-  
+
   // Add JSDoc comments for better GAS IDE experience
   lines.push('/**')
   lines.push(' * Google Apps Script utility functions')
@@ -46,12 +46,12 @@ function convertTSToJS(sourceFile) {
   lines.push('')
 
   // Process type aliases - convert to JSDoc
-  const typeAliases = sourceFile.getTypeAliases().filter(t => t.isExported())
+  const typeAliases = sourceFile.getTypeAliases().filter((t) => t.isExported())
   for (const typeAlias of typeAliases) {
     const name = typeAlias.getName()
     const typeText = typeAlias.getTypeNode()?.getText() || 'any'
     const comment = extractJSDocComment(typeAlias)
-    
+
     if (comment) {
       const cleanComment = extractCleanComment(comment)
       lines.push(`// ${cleanComment}`)
@@ -61,44 +61,46 @@ function convertTSToJS(sourceFile) {
   }
 
   // Process exported functions - convert to plain JavaScript
-  const functions = sourceFile.getFunctions().filter(f => f.isExported())
+  const functions = sourceFile.getFunctions().filter((f) => f.isExported())
   for (const func of functions) {
     const name = func.getName()
     const params = func.getParameters()
     const body = func.getBodyText() || ''
     const comment = extractJSDocComment(func)
-    
+
     // Add JSDoc comment
     if (comment) {
       lines.push(comment.replace(/export /g, ''))
     }
-    
+
     // Create function signature without TypeScript annotations
-    const paramList = params.map(param => {
-      const paramName = param.getName()
-      const hasDefault = param.hasInitializer()
-      const defaultValue = hasDefault ? param.getInitializer()?.getText() : null
-      
-      return defaultValue ? `${paramName} = ${defaultValue}` : paramName
-    }).join(', ')
-    
+    const paramList = params
+      .map((param) => {
+        const paramName = param.getName()
+        const hasDefault = param.hasInitializer()
+        const defaultValue = hasDefault ? param.getInitializer()?.getText() : null
+
+        return defaultValue ? `${paramName} = ${defaultValue}` : paramName
+      })
+      .join(', ')
+
     lines.push(`function ${name}(${paramList}) {`)
-    
+
     // Clean up the function body - remove type annotations and fix formatting
     let cleanBody = body
-      .replace(/:\s*[A-Za-z\[\]|<>\s]+(?=\s*[=,)}])/g, '') // Remove type annotations
-      .replace(/as\s+[A-Za-z\[\]|<>\s]+/g, '') // Remove 'as' type assertions
-    
+      .replace(/:\s*[A-Za-z[\]|<>\s]+(?=\s*[=,)}])/g, '') // Remove type annotations
+      .replace(/as\s+[A-Za-z[\]|<>\s]+/g, '') // Remove 'as' type assertions
+
     // Properly indent and format the body
     const bodyLines = cleanBody.split('\n')
-    const indentedLines = bodyLines.map(line => {
+    const indentedLines = bodyLines.map((line) => {
       const trimmed = line.trim()
       if (!trimmed) return ''
       return `  ${trimmed}`
     })
-    
+
     cleanBody = indentedLines.join('\n')
-    
+
     lines.push(cleanBody)
     lines.push('}')
     lines.push('')
@@ -122,8 +124,8 @@ function extractCleanComment(jsdocComment) {
     .replace(/\/\*\*|\*\//g, '')
     .replace(/^\s*\*\s?/gm, '')
     .split('\n')
-    .map(line => line.trim())
-    .filter(line => line && !line.startsWith('@'))
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith('@'))
     .join(' ')
     .trim()
 }
