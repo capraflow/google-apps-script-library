@@ -10,7 +10,7 @@ async function buildGAS() {
   })
 
   const sourceFiles = project.getSourceFiles('./app/**/*.ts')
-  const outputDir = './dist/gas'
+  const outputDir = './dist/gas-lib'
 
   await mkdir(outputDir, { recursive: true })
 

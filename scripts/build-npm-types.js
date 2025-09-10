@@ -10,7 +10,7 @@ async function buildTypes() {
   })
 
   const sourceFiles = project.getSourceFiles('./app/**/*.ts')
-  const outputDir = './dist/types'
+  const outputDir = './dist/npm-types'
 
   await mkdir(outputDir, { recursive: true })
 

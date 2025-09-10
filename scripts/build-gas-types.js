@@ -10,7 +10,7 @@ async function buildJSDoc() {
   })
 
   const sourceFiles = project.getSourceFiles('./app/**/*.ts')
-  const outputDir = './dist/types-jsdoc'
+  const outputDir = './dist/gas-types'
 
   await mkdir(outputDir, { recursive: true })
 

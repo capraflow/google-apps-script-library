@@ -10,7 +10,7 @@ async function buildNPM() {
   })
 
   const sourceFiles = project.getSourceFiles('./app/**/*.ts')
-  const outputDir = './dist/npm'
+  const outputDir = './dist/npm-lib'
   const srcDir = join(outputDir, 'src')
 
   await mkdir(srcDir, { recursive: true })
