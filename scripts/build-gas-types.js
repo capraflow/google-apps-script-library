@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, writeFile, rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import { Project } from 'ts-morph'
 
@@ -12,6 +12,8 @@ async function buildJSDoc() {
   const sourceFiles = project.getSourceFiles('./app/**/*.ts')
   const outputDir = './dist/gas-types'
 
+  // Clean output directory
+  await rm(outputDir, { recursive: true, force: true })
   await mkdir(outputDir, { recursive: true })
 
   // Collect all exports from all source files

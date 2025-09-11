@@ -8,7 +8,7 @@
     "build:npm-types": "node scripts/build-npm-types.js",
     "build:gas-lib": "node scripts/build-gas-lib.js",
     "build:npm-lib": "node scripts/build-npm-lib.js",
-    "build": "pnpm run build:gas-types && pnpm run build:npm-types && pnpm run build:gas-lib && pnpm run build:npm-lib",
+    "build": "rm -rf dist && mkdir -p dist && pnpm run build:gas-lib && pnpm run build:gas-types && pnpm run build:npm-lib && pnpm run build:npm-types",
     "check": "biome check --write && tsc --noEmit",
     "clean": "rm -rf node_modules",
     "push": "clasp push",

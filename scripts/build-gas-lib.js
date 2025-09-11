@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, writeFile, rm } from 'node:fs/promises'
 import { basename, join } from 'node:path'
 import { Project } from 'ts-morph'
 
@@ -12,6 +12,8 @@ async function buildGAS() {
   const sourceFiles = project.getSourceFiles('./app/**/*.ts')
   const outputDir = './dist/gas-lib'
 
+  // Clean output directory
+  await rm(outputDir, { recursive: true, force: true })
   await mkdir(outputDir, { recursive: true })
 
   // Process each TypeScript file
@@ -36,98 +38,29 @@ async function buildGAS() {
 }
 
 function convertTSToJS(sourceFile) {
-  const lines = []
+  // Get the full text and remove TypeScript-specific syntax
+  let content = sourceFile.getFullText()
 
-  // Add JSDoc comments for better GAS IDE experience
-  lines.push('/**')
-  lines.push(' * Google Apps Script utility functions')
-  lines.push(' * Generated from TypeScript source')
-  lines.push(' */')
-  lines.push('')
+  // Remove type annotations from function parameters and return types
+  content = content.replace(/:\s*[A-Za-z[\]|<>\s{},'"]+(?=\s*[=,){\n])/g, '')
 
-  // Process type aliases - convert to JSDoc
-  const typeAliases = sourceFile.getTypeAliases().filter((t) => t.isExported())
-  for (const typeAlias of typeAliases) {
-    const name = typeAlias.getName()
-    const typeText = typeAlias.getTypeNode()?.getText() || 'any'
-    const comment = extractJSDocComment(typeAlias)
+  // Remove 'as' type assertions
+  content = content.replace(/\s+as\s+[A-Za-z[\]|<>\s]+/g, '')
 
-    if (comment) {
-      const cleanComment = extractCleanComment(comment)
-      lines.push(`// ${cleanComment}`)
-    }
-    lines.push(`// @typedef {${typeText}} ${name}`)
-    lines.push('')
-  }
+  // Remove type aliases (export type ...)
+  content = content.replace(/^export\s+type\s+[^\n]+$/gm, '')
 
-  // Process exported functions - convert to plain JavaScript
-  const functions = sourceFile.getFunctions().filter((f) => f.isExported())
-  for (const func of functions) {
-    const name = func.getName()
-    const params = func.getParameters()
-    const body = func.getBodyText() || ''
-    const comment = extractJSDocComment(func)
+  // Remove interface declarations
+  content = content.replace(/^export\s+interface\s+[^}]+}\s*$/gm, '')
 
-    // Add JSDoc comment
-    if (comment) {
-      lines.push(comment.replace(/export /g, ''))
-    }
+  // Remove import statements for types only
+  content = content.replace(/^import\s+type\s+[^\n]+$/gm, '')
 
-    // Create function signature without TypeScript annotations
-    const paramList = params
-      .map((param) => {
-        const paramName = param.getName()
-        const hasDefault = param.hasInitializer()
-        const defaultValue = hasDefault ? param.getInitializer()?.getText() : null
+  // Remove empty lines that were left by removed type declarations
+  content = content.replace(/^\s*\n/gm, '\n')
 
-        return defaultValue ? `${paramName} = ${defaultValue}` : paramName
-      })
-      .join(', ')
-
-    lines.push(`function ${name}(${paramList}) {`)
-
-    // Clean up the function body - remove type annotations and fix formatting
-    let cleanBody = body
-      .replace(/:\s*[A-Za-z[\]|<>\s]+(?=\s*[=,)}])/g, '') // Remove type annotations
-      .replace(/as\s+[A-Za-z[\]|<>\s]+/g, '') // Remove 'as' type assertions
-
-    // Properly indent and format the body
-    const bodyLines = cleanBody.split('\n')
-    const indentedLines = bodyLines.map((line) => {
-      const trimmed = line.trim()
-      if (!trimmed) return ''
-      return `  ${trimmed}`
-    })
-
-    cleanBody = indentedLines.join('\n')
-
-    lines.push(cleanBody)
-    lines.push('}')
-    lines.push('')
-  }
-
-  return lines.join('\n')
-}
-
-function extractJSDocComment(node) {
-  const jsDoc = node.getJsDocs()
-  if (jsDoc.length > 0) {
-    return jsDoc[0].getText()
-  }
-  return null
-}
-
-function extractCleanComment(jsdocComment) {
-  if (!jsdocComment) return ''
-
-  return jsdocComment
-    .replace(/\/\*\*|\*\//g, '')
-    .replace(/^\s*\*\s?/gm, '')
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line && !line.startsWith('@'))
-    .join(' ')
-    .trim()
+  // Remove leading/trailing whitespace but preserve internal structure
+  return content.trim()
 }
 
 buildGAS().catch(console.error)

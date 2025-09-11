@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import { mkdir, writeFile } from 'node:fs/promises'
+import { readFileSync } from 'node:fs'
+import { mkdir, writeFile, rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import { Project } from 'ts-morph'
 
@@ -12,6 +13,8 @@ async function buildTypes() {
   const sourceFiles = project.getSourceFiles('./app/**/*.ts')
   const outputDir = './dist/npm-types'
 
+  // Clean output directory
+  await rm(outputDir, { recursive: true, force: true })
   await mkdir(outputDir, { recursive: true })
 
   // Collect all exports from all source files
@@ -56,9 +59,21 @@ async function buildTypes() {
 
   const outputContent = generateTypeDeclarations(allTypes, allInterfaces)
 
-  await writeFile(join(outputDir, 'types.d.ts'), outputContent)
+  await writeFile(join(outputDir, 'index.d.ts'), outputContent)
 
-  console.log(`Generated TypeScript declarations in ${outputDir}`)
+  // Generate package.json
+  const packageJson = generatePackageJson()
+  await writeFile(join(outputDir, 'package.json'), JSON.stringify(packageJson, null, 2))
+
+  // Generate README.md
+  const readme = generateReadme()
+  await writeFile(join(outputDir, 'README.md'), readme)
+
+  // Generate .npmignore
+  const npmignore = generateNpmignore()
+  await writeFile(join(outputDir, '.npmignore'), npmignore)
+
+  console.log(`Generated TypeScript declarations and npm package files in ${outputDir}`)
 }
 
 function generateTypeDeclarations(types, interfaces) {
@@ -150,6 +165,155 @@ function extractCleanComment(jsdocComment) {
     .filter((line) => line && !line.startsWith('@'))
     .join(' ')
     .trim()
+}
+
+function generatePackageJson() {
+  // Read the main package.json for version and basic info
+  const mainPackageJson = JSON.parse(readFileSync('./package.json', 'utf8'))
+
+  return {
+    name: `@types/${mainPackageJson.name}`,
+    version: mainPackageJson.version || '1.0.0',
+    description: `TypeScript definitions for ${mainPackageJson.name}`,
+    license: 'MIT',
+    main: '',
+    types: 'index.d.ts',
+    repository: {
+      type: 'git',
+      url: 'https://github.com/your-org/your-repo.git',
+    },
+    scripts: {},
+    dependencies: {},
+    peerDependencies: {},
+    typeScriptVersion: '5.2',
+  }
+}
+
+function generateReadme() {
+  const mainPackageJson = JSON.parse(readFileSync('./package.json', 'utf8'))
+
+  return `# @types/${mainPackageJson.name}
+
+TypeScript definitions for ${mainPackageJson.name}
+
+## Installation
+
+\`\`\`bash
+npm install @types/${mainPackageJson.name}
+\`\`\`
+
+## Usage
+
+This package provides TypeScript type definitions for the ${mainPackageJson.name} Google Apps Script library.
+
+### Prerequisites
+
+1. Link the Google Apps Script library in your project
+2. Install this types package for TypeScript support
+
+### Example
+
+\`\`\`typescript
+// After linking the library in your GAS project settings
+declare const MyUtilityLibrary: typeof Utils;
+
+// Use with full type support
+const date = MyUtilityLibrary.toDate('2023-01-01');
+if (MyUtilityLibrary.isDate(date)) {
+  console.log(date.toISOString());
+}
+\`\`\`
+
+## API
+
+This package provides types for utility functions including:
+
+- Date conversion and validation utilities
+- Type checking and casting functions
+- HTTP utilities for Google Apps Script
+
+## License
+
+MIT
+`
+}
+
+function generateNpmignore() {
+  return `# Source files
+src/
+app/
+scripts/
+
+# Development files
+*.ts
+!*.d.ts
+tsconfig.json
+biome.json
+
+# Build artifacts
+dist/
+node_modules/
+
+# IDE files
+.vscode/
+.idea/
+
+# Version control
+.git/
+.gitignore
+
+# Documentation (except README)
+docs/
+*.md
+!README.md
+
+# Testing
+test/
+tests/
+__tests__/
+*.test.*
+*.spec.*
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+`
 }
 
 buildTypes().catch(console.error)

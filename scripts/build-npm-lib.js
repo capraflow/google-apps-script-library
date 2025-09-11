@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, writeFile, rm } from 'node:fs/promises'
 import { basename, join } from 'node:path'
 import { Project } from 'ts-morph'
 
@@ -13,6 +13,8 @@ async function buildNPM() {
   const outputDir = './dist/npm-lib'
   const srcDir = join(outputDir, 'src')
 
+  // Clean output directory
+  await rm(outputDir, { recursive: true, force: true })
   await mkdir(srcDir, { recursive: true })
 
   // Copy TypeScript source files
