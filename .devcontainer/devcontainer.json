@@ -13,7 +13,7 @@
     "ghcr.io/devcontainers/features/github-cli": {}
   },
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": ".devcontainer/install-packages.sh",
+  "postCreateCommand": "chmod +x .devcontainer/install-packages.sh && .devcontainer/install-packages.sh",
   // Configure tool-specific properties.
   "customizations": {
     "vscode": {
