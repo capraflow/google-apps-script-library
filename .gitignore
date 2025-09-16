@@ -7,8 +7,12 @@
 *.log
 *.log.*
 
-# Temp
+# Local
+*.local.*
 **/.temp/
+**/temp/
+**/scratchpad/
+
 
 # Build
 **/bin/
