@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { mkdir, writeFile, rm } from 'node:fs/promises'
+import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { basename, join } from 'node:path'
 import { Project } from 'ts-morph'
 

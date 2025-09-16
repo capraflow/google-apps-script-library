@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-import { mkdir, writeFile, rm, readFile } from 'node:fs/promises'
-import { basename, join, dirname } from 'node:path'
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { copyFileSync, readFileSync } from 'node:fs'
+import { basename, dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { Project } from 'ts-morph'
 
@@ -45,9 +46,8 @@ async function buildNPM() {
   const tsConfig = generateTSConfig()
   await writeFile(join(outputDir, 'tsconfig.json'), JSON.stringify(tsConfig, null, 2))
 
-  // Generate README
-  const readme = generateReadme()
-  await writeFile(join(outputDir, 'README.md'), readme)
+  // Copy README.md from docs template
+  copyFileSync('./docs/npm-lib-readme.md', join(outputDir, 'README.md'))
 
   // Generate .npmignore
   const npmIgnore = generateNpmIgnore()
@@ -98,26 +98,56 @@ function generateIndexFile(sourceFiles) {
 }
 
 function generatePackageJson() {
+  // Read the main package.json for version
+  const mainPackageJson = JSON.parse(readFileSync('./package.json', 'utf8'))
+
   return {
-    name: '@your-org/gas-utils',
-    version: '1.0.0',
-    description: 'Utility functions for Google Apps Script development',
+    name: 'gas-utils-library',
+    version: mainPackageJson.version || '1.0.0',
+    description: 'Self-contained Google Apps Script utility library with TypeScript support',
+    author: {
+      name: 'Daniel Reichl',
+      email: 'daniel@capraflow.com'
+    },
+    license: 'MIT',
     main: 'dist/index.js',
     module: 'dist/index.js',
     types: 'dist/index.d.ts',
     bin: {
-      'gas-utils': './bin/gas-utils-build.js'
+      'gas-utils': './bin/gas-utils-build.js',
     },
-    files: ['dist/**/*', 'src/**/*', 'bin/**/*', 'README.md', 'package.json'],
+    keywords: [
+      'google-apps-script',
+      'gas',
+      'utilities',
+      'typescript',
+      'bundler',
+      'self-contained'
+    ],
+    files: [
+      'dist/**/*',
+      'src/**/*',
+      'bin/**/*',
+      'README.md',
+      'package.json'
+    ],
     scripts: {
       build: 'tsc',
       prepublishOnly: 'npm run build',
     },
-    keywords: ['google-apps-script', 'gas', 'utilities', 'typescript', 'productivity'],
-    author: 'Your Name',
-    license: 'MIT',
+    engines: {
+      node: '>=18.0.0'
+    },
+    repository: {
+      type: 'git',
+      url: 'https://github.com/your-org/gas-utils-library.git',
+    },
+    homepage: 'https://github.com/your-org/gas-utils-library#readme',
+    bugs: {
+      url: 'https://github.com/your-org/gas-utils-library/issues',
+    },
     dependencies: {
-      'ts-morph': '^27'
+      'ts-morph': '^27',
     },
     devDependencies: {
       '@types/google-apps-script': '^2',
@@ -125,15 +155,7 @@ function generatePackageJson() {
     },
     peerDependencies: {
       '@types/google-apps-script': '^2',
-    },
-    repository: {
-      type: 'git',
-      url: 'https://github.com/your-org/gas-utils.git',
-    },
-    homepage: 'https://github.com/your-org/gas-utils#readme',
-    bugs: {
-      url: 'https://github.com/your-org/gas-utils/issues',
-    },
+    }
   }
 }
 
@@ -275,7 +297,6 @@ Union type for values that can be converted to Date: \`Date | number | string | 
 MIT
 `
 }
-
 
 function generateNpmIgnore() {
   return `# Source files

@@ -18,7 +18,7 @@ importers:
         specifier: ^2
         version: 2.0.1
       ts-morph:
-        specifier: ^27.0.0
+        specifier: ^27
         version: 27.0.0
       typescript:
         specifier: ^5

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { mkdir, writeFile, rm } from 'node:fs/promises'
+import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { Project } from 'ts-morph'
 
@@ -30,7 +30,12 @@ async function buildJSDoc() {
 
   await writeFile(join(outputDir, 'types.js'), outputContent)
 
+  // Also create the file in docs/ for GitHub README reference
+  await mkdir('./docs', { recursive: true })
+  await writeFile('./docs/gas-types.js', outputContent)
+
   console.log(`Generated JSDoc types in ${outputDir}`)
+  console.log(`Generated JSDoc types reference in ./docs/gas-types.js`)
 }
 
 function extractExportsFromFile(sourceFile) {

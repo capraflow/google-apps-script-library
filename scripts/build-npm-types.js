@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { readFileSync } from 'node:fs'
-import { mkdir, writeFile, rm } from 'node:fs/promises'
+import { readFileSync, copyFileSync } from 'node:fs'
+import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { Project } from 'ts-morph'
 
@@ -65,9 +65,8 @@ async function buildTypes() {
   const packageJson = generatePackageJson()
   await writeFile(join(outputDir, 'package.json'), JSON.stringify(packageJson, null, 2))
 
-  // Generate README.md
-  const readme = generateReadme()
-  await writeFile(join(outputDir, 'README.md'), readme)
+  // Copy README.md from docs template
+  copyFileSync('./docs/npm-types-readme.md', join(outputDir, 'README.md'))
 
   // Generate .npmignore
   const npmignore = generateNpmignore()
@@ -172,20 +171,43 @@ function generatePackageJson() {
   const mainPackageJson = JSON.parse(readFileSync('./package.json', 'utf8'))
 
   return {
-    name: `@types/${mainPackageJson.name}`,
+    name: 'gas-utils-library-types',
     version: mainPackageJson.version || '1.0.0',
-    description: `TypeScript definitions for ${mainPackageJson.name}`,
+    description: 'TypeScript type declarations for Google Apps Script utility library',
+    author: {
+      name: 'Daniel Reichl',
+      email: 'daniel@capraflow.com'
+    },
     license: 'MIT',
     main: '',
     types: 'index.d.ts',
+    keywords: [
+      'google-apps-script',
+      'gas',
+      'typescript',
+      'types',
+      'definitions',
+      'utilities'
+    ],
     repository: {
       type: 'git',
-      url: 'https://github.com/your-org/your-repo.git',
+      url: 'https://github.com/your-org/gas-utils-library.git'
     },
+    bugs: {
+      url: 'https://github.com/your-org/gas-utils-library/issues'
+    },
+    homepage: 'https://github.com/your-org/gas-utils-library#readme',
+    engines: {
+      node: '>=18.0.0'
+    },
+    files: [
+      'index.d.ts',
+      'README.md'
+    ],
     scripts: {},
     dependencies: {},
     peerDependencies: {},
-    typeScriptVersion: '5.2',
+    typeScriptVersion: '5.0'
   }
 }
 
