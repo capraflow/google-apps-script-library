@@ -33,6 +33,12 @@
     }
   },
   "files": {
-    "includes": ["**", "!**/node_modules", "!**/package-lock.json", "!**/dist"]
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/package-lock.json",
+      "!**/dist",
+      "!**/docs"
+    ]
   }
 }

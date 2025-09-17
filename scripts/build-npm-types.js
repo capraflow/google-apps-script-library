@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { readFileSync, copyFileSync } from 'node:fs'
+import { copyFileSync, readFileSync } from 'node:fs'
 import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { Project } from 'ts-morph'
@@ -176,7 +176,7 @@ function generatePackageJson() {
     description: 'TypeScript type declarations for Google Apps Script utility library',
     author: {
       name: 'Daniel Reichl',
-      email: 'daniel@capraflow.com'
+      email: 'daniel@capraflow.com',
     },
     license: 'MIT',
     main: '',
@@ -187,77 +187,25 @@ function generatePackageJson() {
       'typescript',
       'types',
       'definitions',
-      'utilities'
+      'utilities',
     ],
     repository: {
       type: 'git',
-      url: 'https://github.com/your-org/gas-utils-library.git'
+      url: 'https://github.com/your-org/gas-utils-library.git',
     },
     bugs: {
-      url: 'https://github.com/your-org/gas-utils-library/issues'
+      url: 'https://github.com/your-org/gas-utils-library/issues',
     },
     homepage: 'https://github.com/your-org/gas-utils-library#readme',
     engines: {
-      node: '>=18.0.0'
+      node: '>=18.0.0',
     },
-    files: [
-      'index.d.ts',
-      'README.md'
-    ],
+    files: ['index.d.ts', 'README.md'],
     scripts: {},
     dependencies: {},
     peerDependencies: {},
-    typeScriptVersion: '5.0'
+    typeScriptVersion: '5.0',
   }
-}
-
-function generateReadme() {
-  const mainPackageJson = JSON.parse(readFileSync('./package.json', 'utf8'))
-
-  return `# @types/${mainPackageJson.name}
-
-TypeScript definitions for ${mainPackageJson.name}
-
-## Installation
-
-\`\`\`bash
-npm install @types/${mainPackageJson.name}
-\`\`\`
-
-## Usage
-
-This package provides TypeScript type definitions for the ${mainPackageJson.name} Google Apps Script library.
-
-### Prerequisites
-
-1. Link the Google Apps Script library in your project
-2. Install this types package for TypeScript support
-
-### Example
-
-\`\`\`typescript
-// After linking the library in your GAS project settings
-declare const MyUtilityLibrary: typeof Utils;
-
-// Use with full type support
-const date = MyUtilityLibrary.toDate('2023-01-01');
-if (MyUtilityLibrary.isDate(date)) {
-  console.log(date.toISOString());
-}
-\`\`\`
-
-## API
-
-This package provides types for utility functions including:
-
-- Date conversion and validation utilities
-- Type checking and casting functions
-- HTTP utilities for Google Apps Script
-
-## License
-
-MIT
-`
 }
 
 function generateNpmignore() {

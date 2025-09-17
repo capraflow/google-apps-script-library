@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { copyFileSync, readFileSync } from 'node:fs'
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { basename, dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { Project } from 'ts-morph'
@@ -104,10 +104,11 @@ function generatePackageJson() {
   return {
     name: 'gas-utils-library',
     version: mainPackageJson.version || '1.0.0',
-    description: 'Self-contained Google Apps Script utility library with TypeScript support',
+    description:
+      'Self-contained Google Apps Script utility library with TypeScript support',
     author: {
       name: 'Daniel Reichl',
-      email: 'daniel@capraflow.com'
+      email: 'daniel@capraflow.com',
     },
     license: 'MIT',
     main: 'dist/index.js',
@@ -122,21 +123,15 @@ function generatePackageJson() {
       'utilities',
       'typescript',
       'bundler',
-      'self-contained'
+      'self-contained',
     ],
-    files: [
-      'dist/**/*',
-      'src/**/*',
-      'bin/**/*',
-      'README.md',
-      'package.json'
-    ],
+    files: ['dist/**/*', 'src/**/*', 'bin/**/*', 'README.md', 'package.json'],
     scripts: {
       build: 'tsc',
       prepublishOnly: 'npm run build',
     },
     engines: {
-      node: '>=18.0.0'
+      node: '>=18.0.0',
     },
     repository: {
       type: 'git',
@@ -155,7 +150,7 @@ function generatePackageJson() {
     },
     peerDependencies: {
       '@types/google-apps-script': '^2',
-    }
+    },
   }
 }
 
@@ -177,125 +172,6 @@ function generateTSConfig() {
     include: ['src/**/*'],
     exclude: ['node_modules', 'dist'],
   }
-}
-
-function generateReadme() {
-  return `# Google Apps Script Utilities
-
-A utility library for Google Apps Script development with TypeScript support and **zero-config bundling**.
-
-## Installation
-
-\`\`\`bash
-npm install @your-org/gas-utils
-\`\`\`
-
-## Quick Start
-
-1. **Create your project structure:**
-   \`\`\`
-   my-gas-project/
-   ├── src/
-   │   ├── main.ts      ← Your business logic
-   │   └── utils.ts     ← Your helper functions
-   └── package.json
-   \`\`\`
-
-2. **Write your code with imports:**
-   \`\`\`typescript
-   // src/main.ts
-   import { toDate, isDate } from '@your-org/gas-utils'
-
-   function myGASFunction() {
-     const date = toDate('2023-01-01')
-     if (isDate(date)) {
-       console.log(date.toISOString())
-     }
-   }
-   \`\`\`
-
-3. **Build for Google Apps Script:**
-   \`\`\`bash
-   npx gas-utils build
-   \`\`\`
-
-4. **Deploy to GAS:**
-   \`\`\`
-   dist/
-   ├── main.js           ← 1:1 mapping for perfect debugging
-   ├── utils.js          ← Your helper functions
-   ├── lib/
-   │   └── gas-utils.js  ← Tree-shaken utilities (only toDate & isDate!)
-   └── appsscript.json
-   \`\`\`
-
-## Key Features
-
-- ✅ **Zero-config bundling** - No webpack, no complex setup
-- ✅ **Perfect debugging** - 1:1 file mapping preserves line numbers
-- ✅ **Tree shaking** - Only includes utilities you actually use
-- ✅ **Zero dependencies** for users - Uses existing ts-morph
-- ✅ **TypeScript support** - Full type safety during development
-
-## Usage Examples
-
-### Import specific utilities (recommended)
-
-\`\`\`typescript
-import { toDate, isDate } from '@your-org/gas-utils'
-
-function processDate() {
-  const date = toDate('2023-01-01')
-  if (isDate(date)) {
-    return date.toISOString()
-  }
-}
-\`\`\`
-
-### Import everything
-
-\`\`\`typescript
-import * as Utils from '@your-org/gas-utils'
-
-function processDate() {
-  const date = Utils.toDate('2023-01-01')
-  if (Utils.isDate(date)) {
-    return date.toISOString()
-  }
-}
-\`\`\`
-
-## Build Process
-
-Unlike other solutions that require complex bundlers, this package includes a **zero-dependency CLI** that:
-
-1. **Analyzes your imports** to determine which utilities you use
-2. **Builds user files with 1:1 mapping** for perfect debugging
-3. **Creates tree-shaken utility bundle** with only the functions you need
-4. **Generates Google Apps Script compatible output**
-
-## Functions
-
-### Date Utilities
-
-#### \`toDate(value, defaultValue?): Date | undefined\`
-Converts a value to a Date object, returning undefined or defaultValue if conversion fails.
-
-#### \`toDateStrict(value, defaultValue?): Date\`
-Converts a value to a Date object, throwing an error if conversion fails.
-
-#### \`isDate(value): boolean\`
-Returns true if the value is a valid Date object.
-
-## Types
-
-### \`DateValue\`
-Union type for values that can be converted to Date: \`Date | number | string | null | undefined\`
-
-## License
-
-MIT
-`
 }
 
 function generateNpmIgnore() {
