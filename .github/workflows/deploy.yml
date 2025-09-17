@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install pnpm
@@ -35,12 +35,11 @@ jobs:
 
       - name: Deploy to Google Apps Script
         run: |
-          echo '${{ secrets.CLASP_CREDENTIALS }}' > ~/.clasprc.json
+          echo "${{ secrets.CLASP_CREDENTIALS }}" > "${RUNNER_TEMP}/clasp.json"
+          pnpm exec clasp login --creds "${RUNNER_TEMP}/clasp.json"
           pnpm exec clasp push
           VERSION=$(node -p "require('./package.json').version")
           pnpm exec clasp create-deployment --description "v$VERSION - $(date '+%Y-%m-%d %H:%M:%S')"
-        env:
-          CLASP_CREDENTIALS: ${{ secrets.CLASP_CREDENTIALS }}
 
       - name: Publish Types Package to NPM
         run: |
