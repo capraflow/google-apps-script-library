@@ -38,6 +38,12 @@ jobs:
           CLASP_CREDENTIALS: ${{ secrets.CLASP_CREDENTIALS }}
         run: |
           echo "$CLASP_CREDENTIALS" > ~/.clasprc.json
+          echo "Contents of ~/.clasprc.json:"
+          cat ~/.clasprc.json
+          echo "Testing clasp authentication:"
+          pnpm exec clasp --version
+          pnpm exec clasp list-scripts
+          echo "Pushing to Apps Script:"
           pnpm exec clasp push
           VERSION=$(node -p "require('./package.json').version")
           pnpm exec clasp create-deployment --description "v$VERSION - $(date '+%Y-%m-%d %H:%M:%S')"
