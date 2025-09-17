@@ -2,8 +2,8 @@ name: Deploy to Production
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
 
 jobs:
   deploy:
@@ -27,11 +27,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Set version from tag
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          npm version $VERSION --no-git-tag-version
-
       - name: Build all distribution formats
         run: pnpm run build
 
@@ -42,6 +37,8 @@ jobs:
         run: |
           echo '${{ secrets.CLASP_CREDENTIALS }}' > ~/.clasprc.json
           pnpm run push
+          VERSION=$(node -p "require('./package.json').version")
+          clasp deploy --description "v$VERSION - $(date '+%Y-%m-%d %H:%M:%S')"
         env:
           CLASP_CREDENTIALS: ${{ secrets.CLASP_CREDENTIALS }}
 
@@ -59,23 +56,40 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Get version for release
+        id: get-version
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Create Git tag
+        run: |
+          git tag "v${{ steps.get-version.outputs.version }}"
+          git push origin "v${{ steps.get-version.outputs.version }}"
+
       - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: "v${{ steps.get-version.outputs.version }}"
+          release_name: "Release v${{ steps.get-version.outputs.version }}"
           body: |
-            Automated release for version ${{ github.ref }}
+            Automated release for version ${{ steps.get-version.outputs.version }}
 
             ## Changes
-            - Deployed to Google Apps Script
-            - Published to NPM as latest version
+            - Deployed to Google Apps Script with versioned deployment
+            - Published gas-utils-library-types@${{ steps.get-version.outputs.version }} to NPM
+            - Published gas-utils-library@${{ steps.get-version.outputs.version }} to NPM
 
             ## Installation
             ```bash
-            npm install ${{ github.event.repository.name }}
+            # Types package (for use with GAS library)
+            npm install gas-utils-library-types
+
+            # Self-contained package (no GAS library needed)
+            npm install gas-utils-library
             ```
+
+            ## Latest Commit
+            ${{ github.event.head_commit.message }}
           draft: false
           prerelease: false

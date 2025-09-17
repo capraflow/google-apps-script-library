@@ -38,14 +38,7 @@ async function buildGAS() {
 }
 
 function convertTSToJS(sourceFile) {
-  // Get the full text and remove TypeScript-specific syntax
   let content = sourceFile.getFullText()
-
-  // Remove type annotations from function parameters and return types
-  content = content.replace(/:\s*[A-Za-z[\]|<>\s{},'"]+(?=\s*[=,){\n])/g, '')
-
-  // Remove 'as' type assertions
-  content = content.replace(/\s+as\s+[A-Za-z[\]|<>\s]+/g, '')
 
   // Remove type aliases (export type ...)
   content = content.replace(/^export\s+type\s+[^\n]+$/gm, '')
@@ -55,6 +48,19 @@ function convertTSToJS(sourceFile) {
 
   // Remove import statements for types only
   content = content.replace(/^import\s+type\s+[^\n]+$/gm, '')
+
+  // Remove export keywords from functions and variables (for GAS compatibility)
+  content = content.replace(/^export\s+/gm, '')
+
+  // Remove parameter type annotations and optional markers
+  content = content.replace(/(\w+)\?:\s*[A-Za-z[\]|<>\s{},'"]+/g, '$1')
+  content = content.replace(/(\w+):\s*[A-Za-z[\]|<>\s{},'"]+/g, '$1')
+
+  // Remove function return type annotations
+  content = content.replace(/\):\s*[A-Za-z[\]|<>\s{},'"]+\s+{/g, ') {')
+
+  // Remove 'as' type assertions
+  content = content.replace(/\s+as\s+[A-Za-z[\]|<>\s]+/g, '')
 
   // Remove empty lines that were left by removed type declarations
   content = content.replace(/^\s*\n/gm, '\n')

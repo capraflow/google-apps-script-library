@@ -1,6 +1,6 @@
 {
-  "name": "uhr-cloud-script",
-  "version": "0.0.1-beta.0",
+  "name": "google-apps-script-utility",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "audit": "biome ci",
@@ -11,14 +11,7 @@
     "build": "rm -rf dist && mkdir -p dist && pnpm run build:gas-lib && pnpm run build:gas-types && pnpm run build:npm-lib && pnpm run build:npm-types",
     "check": "biome check --write && tsc --noEmit",
     "clean": "rm -rf node_modules",
-    "push": "clasp push",
-    "pull": "clasp pull",
-    "login": "clasp login",
-    "deploy:gas:dev": "pnpm run build && clasp push",
-    "deploy:npm-types:beta": "pnpm run build && npm version prerelease --preid=beta && cd dist/npm-types && npm publish --tag beta",
-    "deploy:npm-lib:beta": "pnpm run build && npm version prerelease --preid=beta && cd dist/npm-lib && npm publish --tag beta",
-    "deploy:npm:beta": "pnpm run deploy:npm-types:beta && pnpm run deploy:npm-lib:beta",
-    "deploy:dev": "pnpm run deploy:gas:dev && pnpm run deploy:npm:beta"
+    "push": "clasp push"
   },
   "devDependencies": {
     "@biomejs/biome": "^2",
