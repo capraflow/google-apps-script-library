@@ -34,9 +34,10 @@ jobs:
         run: pnpm run check
 
       - name: Deploy to Google Apps Script
+        env:
+          CLASP_CREDENTIALS: ${{ secrets.CLASP_CREDENTIALS }}
         run: |
-          echo '${{ secrets.CLASP_CREDENTIALS }}' > "${RUNNER_TEMP}/clasp.json"
-          pnpm exec clasp login --creds "${RUNNER_TEMP}/clasp.json"
+          echo "$CLASP_CREDENTIALS" > ~/.clasprc.json
           pnpm exec clasp push
           VERSION=$(node -p "require('./package.json').version")
           pnpm exec clasp create-deployment --description "v$VERSION - $(date '+%Y-%m-%d %H:%M:%S')"
