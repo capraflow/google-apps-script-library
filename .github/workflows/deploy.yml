@@ -38,7 +38,7 @@ jobs:
           echo '${{ secrets.CLASP_CREDENTIALS }}' > ~/.clasprc.json
           pnpm run push
           VERSION=$(node -p "require('./package.json').version")
-          clasp deploy --description "v$VERSION - $(date '+%Y-%m-%d %H:%M:%S')"
+          clasp create-deployment --description "v$VERSION - $(date '+%Y-%m-%d %H:%M:%S')"
         env:
           CLASP_CREDENTIALS: ${{ secrets.CLASP_CREDENTIALS }}
 
